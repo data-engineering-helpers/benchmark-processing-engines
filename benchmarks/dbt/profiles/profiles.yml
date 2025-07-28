@@ -1,0 +1,8 @@
+benchmark_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ':memory:'
+      extensions:
+        - parquet
