@@ -9,11 +9,14 @@ Knowledge Sharing (KS) - Benchmark of data processing engines
 aims at benchmarking a few data processing engines (_e.g._, DuckDB, Spark,
 Polars, Daft).
 
+Inspiration: TODO MVC
+
 Even though the members of the GitHub organization may be employed by
 some companies, they speak on their personal behalf and do not represent
 these companies.
 
 # References
+* https://todomvc.com/
 * [Data Engineering Helpers - Knowledge Sharing - Cheat sheets](https://github.com/data-engineering-helpers/ks-cheat-sheets)
   * [Data Engineering Helpers - Knowledge Sharing - Python](https://github.com/data-engineering-helpers/ks-cheat-sheets/tree/main/programming/python)
   * [Data Engineering Helpers - Knowledge Sharing - Spark](https://github.com/data-engineering-helpers/ks-cheat-sheets/blob/main/data-processing/spark/)
