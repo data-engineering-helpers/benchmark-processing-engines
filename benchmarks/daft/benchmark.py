@@ -9,10 +9,11 @@ sys.path.append(str(Path(__file__).parent.parent))
 from benchmark_runner import BenchmarkRunner, get_data_paths
 
 class DaftBenchmark:
-    def __init__(self):
-        self.data_paths = get_data_paths()
+    def __init__(self, scale='medium'):
+        self.data_paths = get_data_paths(scale)
         self.profiles_df = None
         self.events_df = None
+        self.scale = scale
         
     def load_data(self):
         """Load data from parquet files"""
@@ -91,17 +92,17 @@ class DaftBenchmark:
         
         return len(summary_collected)
 
-def run_benchmark():
+def run_benchmark(scale='medium'):
     """Run the Daft benchmark"""
-    runner = BenchmarkRunner()
-    benchmark = DaftBenchmark()
+    runner = BenchmarkRunner(scale)
+    benchmark = DaftBenchmark(scale)
     
     # Run all benchmark tasks
-    runner.run_benchmark("daft", "load_data", benchmark.load_data)
-    runner.run_benchmark("daft", "filter_and_aggregate", benchmark.filter_and_aggregate)
-    runner.run_benchmark("daft", "join_datasets", benchmark.join_datasets)
-    runner.run_benchmark("daft", "complex_analytics", benchmark.complex_analytics)
-    runner.run_benchmark("daft", "write_results", benchmark.write_results)
+    runner.run_benchmark(f"daft_{scale}", "load_data", benchmark.load_data)
+    runner.run_benchmark(f"daft_{scale}", "filter_and_aggregate", benchmark.filter_and_aggregate)
+    runner.run_benchmark(f"daft_{scale}", "join_datasets", benchmark.join_datasets)
+    runner.run_benchmark(f"daft_{scale}", "complex_analytics", benchmark.complex_analytics)
+    runner.run_benchmark(f"daft_{scale}", "write_results", benchmark.write_results)
     
     runner.print_results()
     return runner.results

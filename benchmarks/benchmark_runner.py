@@ -20,8 +20,9 @@ class BenchmarkResult:
     error_message: str = ""
 
 class BenchmarkRunner:
-    def __init__(self):
+    def __init__(self, scale='medium'):
         self.results = []
+        self.scale = scale
         
     def run_benchmark(self, engine: str, task: str, func: Callable) -> BenchmarkResult:
         """Run a single benchmark and collect metrics"""
@@ -106,10 +107,7 @@ BENCHMARK_TASKS = [
     "write_results"
 ]
 
-def get_data_paths():
-    """Get paths to the sample data files"""
-    base_path = Path(__file__).parent.parent
-    return {
-        'profiles': base_path / 'data' / 'bronze' / 'customer_profiles.parquet',
-        'events': base_path / 'data' / 'bronze' / 'customer_events.parquet'
-    }
+def get_data_paths(scale='medium'):
+    """Get paths to the sample data files for a specific scale"""
+    from data_generator import get_data_paths_for_scale
+    return get_data_paths_for_scale(scale)

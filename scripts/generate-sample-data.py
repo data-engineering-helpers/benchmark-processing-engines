@@ -20,9 +20,9 @@ Faker.seed(4321)
 
 class DataGenerator:
     def __init__(self):
-        self.customer_ids = [str(uuid.uuid4()) for _ in range(1000)]
+        self.customer_ids = [str(uuid.uuid4()) for _ in range(10000)]
         
-    def generate_customer_profile(self, num_records=1000):
+    def generate_customer_profile(self, num_records=10000):
         """Génère des profils clients fictifs"""
         profiles = []
         
@@ -51,7 +51,7 @@ class DataGenerator:
             
         return pd.DataFrame(profiles)
     
-    def generate_customer_events(self, num_events=10000, start_date=None):
+    def generate_customer_events(self, num_events=1000000, start_date=None):
         """Génère des événements clients fictifs"""
         if start_date is None:
             start_date = datetime.now() - timedelta(days=30)
@@ -110,11 +110,11 @@ def main():
     
     # Génération des profils
     profiles_df = generator.generate_customer_profile()
-    profiles_df.to_parquet('data/bronze/customer_profiles.parquet')
+    profiles_df.to_parquet('../data/bronze/customer_profiles.parquet')
     
     # Génération des événements
     events_df = generator.generate_customer_events()
-    events_df.to_parquet('data/bronze/customer_events.parquet')
+    events_df.to_parquet('../data/bronze/customer_events.parquet')
     
     # Quelques statistiques
     print("=== Données générées ===")

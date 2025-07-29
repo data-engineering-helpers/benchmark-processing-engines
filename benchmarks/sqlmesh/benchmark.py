@@ -10,9 +10,10 @@ sys.path.append(str(Path(__file__).parent.parent))
 from benchmark_runner import BenchmarkRunner, get_data_paths
 
 class SQLMeshBenchmark:
-    def __init__(self):
-        self.data_paths = get_data_paths()
+    def __init__(self, scale='medium'):
+        self.data_paths = get_data_paths(scale)
         self.sqlmesh_dir = Path(__file__).parent
+        self.scale = scale
         
     def load_data(self):
         """Initialize SQLMesh project"""
@@ -60,17 +61,17 @@ class SQLMeshBenchmark:
         
         return 1 if result.returncode == 0 else 0
 
-def run_benchmark():
+def run_benchmark(scale='medium'):
     """Run the SQLMesh benchmark"""
-    runner = BenchmarkRunner()
-    benchmark = SQLMeshBenchmark()
+    runner = BenchmarkRunner(scale)
+    benchmark = SQLMeshBenchmark(scale)
     
     # Run all benchmark tasks
-    runner.run_benchmark("sqlmesh", "load_data", benchmark.load_data)
-    runner.run_benchmark("sqlmesh", "filter_and_aggregate", benchmark.filter_and_aggregate)
-    runner.run_benchmark("sqlmesh", "join_datasets", benchmark.join_datasets)
-    runner.run_benchmark("sqlmesh", "complex_analytics", benchmark.complex_analytics)
-    runner.run_benchmark("sqlmesh", "write_results", benchmark.write_results)
+    runner.run_benchmark(f"sqlmesh_{scale}", "load_data", benchmark.load_data)
+    runner.run_benchmark(f"sqlmesh_{scale}", "filter_and_aggregate", benchmark.filter_and_aggregate)
+    runner.run_benchmark(f"sqlmesh_{scale}", "join_datasets", benchmark.join_datasets)
+    runner.run_benchmark(f"sqlmesh_{scale}", "complex_analytics", benchmark.complex_analytics)
+    runner.run_benchmark(f"sqlmesh_{scale}", "write_results", benchmark.write_results)
     
     runner.print_results()
     return runner.results

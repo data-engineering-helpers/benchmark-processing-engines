@@ -9,11 +9,12 @@ sys.path.append(str(Path(__file__).parent.parent))
 from benchmark_runner import BenchmarkRunner, get_data_paths
 
 class DataFusionBenchmark:
-    def __init__(self):
-        self.data_paths = get_data_paths()
+    def __init__(self, scale='medium'):
+        self.data_paths = get_data_paths(scale)
         self.ctx = SessionContext()
         self.profiles_loaded = False
         self.events_loaded = False
+        self.scale = scale
         
     def load_data(self):
         """Load data from parquet files into DataFusion"""
@@ -31,60 +32,77 @@ class DataFusionBenchmark:
         return profiles_count + events_count
     
     def filter_and_aggregate(self):
-        """Filter events and create aggregations"""
-        # Simple aggregation by customer and event type
+        """Filter last 7 days and aggregate by customer_id, event_type"""
+        # DataFusion GROUP BY behaves differently, so we count distinct combinations
         result = self.ctx.sql("""
-            SELECT 
-                customer_id,
-                event_type,
-                COUNT(*) as event_count
-            FROM events
-            GROUP BY customer_id, event_type
+            WITH parsed_events AS (
+                SELECT *,
+                       to_timestamp(event_timestamp) as event_ts
+                FROM events
+            ),
+            recent_events AS (
+                SELECT customer_id, event_type
+                FROM parsed_events
+                WHERE event_ts >= (SELECT MAX(event_ts) - INTERVAL '7' DAY FROM parsed_events)
+            )
+            SELECT COUNT(*) FROM (
+                SELECT DISTINCT customer_id, event_type FROM recent_events
+            )
         """).collect()
         
-        return len(result)
+        return result[0].column(0)[0].as_py()
+
     
     def join_datasets(self):
-        """Join profiles with events"""
+        """Inner join profiles with events"""
         result = self.ctx.sql("""
             SELECT COUNT(*)
-            FROM events e
-            INNER JOIN profiles p ON e.customer_id = p.profile_id
+            FROM (
+                SELECT e.event_id, e.customer_id, e.event_type, p.email_status
+                FROM events e
+                INNER JOIN profiles p ON e.customer_id = p.profile_id
+            )
         """).collect()
         
         return result[0].column(0)[0].as_py()
     
     def complex_analytics(self):
-        """Perform complex analytics operations"""
+        """Calculate customer activity metrics"""
         result = self.ctx.sql("""
             WITH event_counts AS (
                 SELECT 
                     customer_id,
-                    COUNT(*) as event_count
+                    COUNT(*) as total_events
                 FROM events
                 GROUP BY customer_id
             ),
-            login_stats AS (
+            login_counts AS (
                 SELECT 
                     customer_id,
-                    COUNT(*) as login_count
+                    COUNT(*) as login_events
                 FROM events
                 WHERE event_type = 'login'
                 GROUP BY customer_id
             )
-            SELECT 
-                ec.customer_id,
-                ec.event_count,
-                COALESCE(ls.login_count, 0) as login_count,
-                ec.event_count * 0.9 as activity_score
-            FROM event_counts ec
-            LEFT JOIN login_stats ls ON ec.customer_id = ls.customer_id
+            SELECT COUNT(*)
+            FROM (
+                SELECT 
+                    ec.customer_id,
+                    ec.total_events,
+                    COALESCE(lc.login_events, 0) as login_events,
+                    0.9 as login_success_rate,
+                    ec.total_events * 0.9 as activity_score,
+                    p.email_status
+                FROM event_counts ec
+                LEFT JOIN login_counts lc ON ec.customer_id = lc.customer_id
+                INNER JOIN profiles p ON ec.customer_id = p.profile_id
+            )
         """).collect()
         
-        return len(result)
+        return result[0].column(0)[0].as_py()
     
     def write_results(self):
-        """Write results to output files"""
+        """Aggregate by event_type and write results"""
         output_dir = Path(__file__).parent / 'output'
         output_dir.mkdir(exist_ok=True)
         
@@ -95,6 +113,7 @@ class DataFusionBenchmark:
                 COUNT(*) as count
             FROM events
             GROUP BY event_type
+            ORDER BY event_type
         """)
         
         # Write to parquet
@@ -107,17 +126,17 @@ class DataFusionBenchmark:
         
         return summary_count
 
-def run_benchmark():
+def run_benchmark(scale='medium'):
     """Run the DataFusion benchmark"""
-    runner = BenchmarkRunner()
-    benchmark = DataFusionBenchmark()
+    runner = BenchmarkRunner(scale)
+    benchmark = DataFusionBenchmark(scale)
     
     # Run all benchmark tasks
-    runner.run_benchmark("datafusion", "load_data", benchmark.load_data)
-    runner.run_benchmark("datafusion", "filter_and_aggregate", benchmark.filter_and_aggregate)
-    runner.run_benchmark("datafusion", "join_datasets", benchmark.join_datasets)
-    runner.run_benchmark("datafusion", "complex_analytics", benchmark.complex_analytics)
-    runner.run_benchmark("datafusion", "write_results", benchmark.write_results)
+    runner.run_benchmark(f"datafusion_{scale}", "load_data", benchmark.load_data)
+    runner.run_benchmark(f"datafusion_{scale}", "filter_and_aggregate", benchmark.filter_and_aggregate)
+    runner.run_benchmark(f"datafusion_{scale}", "join_datasets", benchmark.join_datasets)
+    runner.run_benchmark(f"datafusion_{scale}", "complex_analytics", benchmark.complex_analytics)
+    runner.run_benchmark(f"datafusion_{scale}", "write_results", benchmark.write_results)
     
     runner.print_results()
     return runner.results

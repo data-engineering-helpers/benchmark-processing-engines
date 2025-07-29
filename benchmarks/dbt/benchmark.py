@@ -10,10 +10,11 @@ sys.path.append(str(Path(__file__).parent.parent))
 from benchmark_runner import BenchmarkRunner, get_data_paths
 
 class DBTBenchmark:
-    def __init__(self):
-        self.data_paths = get_data_paths()
+    def __init__(self, scale='medium'):
+        self.data_paths = get_data_paths(scale)
         self.dbt_dir = Path(__file__).parent
         self.profiles_dir = self.dbt_dir / 'profiles'
+        self.scale = scale
         
     def load_data(self):
         """Load data using dbt seed or external tables"""
@@ -79,17 +80,17 @@ class DBTBenchmark:
         
         return 1 if result.returncode == 0 else 0
 
-def run_benchmark():
+def run_benchmark(scale='medium'):
     """Run the dbt benchmark"""
-    runner = BenchmarkRunner()
-    benchmark = DBTBenchmark()
+    runner = BenchmarkRunner(scale)
+    benchmark = DBTBenchmark(scale)
     
     # Run all benchmark tasks
-    runner.run_benchmark("dbt", "load_data", benchmark.load_data)
-    runner.run_benchmark("dbt", "filter_and_aggregate", benchmark.filter_and_aggregate)
-    runner.run_benchmark("dbt", "join_datasets", benchmark.join_datasets)
-    runner.run_benchmark("dbt", "complex_analytics", benchmark.complex_analytics)
-    runner.run_benchmark("dbt", "write_results", benchmark.write_results)
+    runner.run_benchmark(f"dbt_{scale}", "load_data", benchmark.load_data)
+    runner.run_benchmark(f"dbt_{scale}", "filter_and_aggregate", benchmark.filter_and_aggregate)
+    runner.run_benchmark(f"dbt_{scale}", "join_datasets", benchmark.join_datasets)
+    runner.run_benchmark(f"dbt_{scale}", "complex_analytics", benchmark.complex_analytics)
+    runner.run_benchmark(f"dbt_{scale}", "write_results", benchmark.write_results)
     
     runner.print_results()
     return runner.results

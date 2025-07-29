@@ -25,16 +25,16 @@ def import_benchmark_module(engine_name):
         print(f"Error importing {engine_name} benchmark: {e}")
         return None
 
-def run_single_engine(engine_name):
-    """Run benchmark for a single engine"""
+def run_single_engine(engine_name, scale='medium'):
+    """Run benchmark for a single engine at a specific scale"""
     print(f"\n{'='*60}")
-    print(f"Running {engine_name.upper()} Benchmark")
+    print(f"Running {engine_name.upper()} Benchmark - Scale: {scale}")
     print(f"{'='*60}")
     
     module = import_benchmark_module(engine_name)
     if module and hasattr(module, 'run_benchmark'):
         try:
-            return module.run_benchmark()
+            return module.run_benchmark(scale)
         except Exception as e:
             print(f"Error running {engine_name} benchmark: {e}")
             return []
@@ -45,19 +45,48 @@ def run_single_engine(engine_name):
 def main():
     """Main function to run all benchmarks"""
     engines = ['raw_python', 'polars', 'duckdb', 'daft', 'datafusion', 'pyspark', 'dbt', 'sqlmesh']
+    scales = ['small', 'medium', 'large', 'xlarge']
     
-    # Allow running specific engines via command line
-    if len(sys.argv) > 1:
-        engines = [arg for arg in sys.argv[1:] if arg in engines]
-        if not engines:
-            print("Available engines: raw_python, polars, duckdb, daft, datafusion, pyspark, dbt, sqlmesh")
-            return
+    # Parse command line arguments
+    selected_engines = []
+    selected_scales = ['medium']  # default scale
+    
+    for arg in sys.argv[1:]:
+        if arg in engines:
+            selected_engines.append(arg)
+        elif arg in scales:
+            selected_scales = [arg]
+        elif arg == '--all-scales':
+            selected_scales = scales
+    
+    if not selected_engines:
+        selected_engines = engines
+    
+    if len(sys.argv) > 1 and ('--help' in sys.argv or '-h' in sys.argv):
+        print("Usage: python run_all_benchmarks.py [engines...] [scale] [--all-scales]")
+        print(f"Available engines: {', '.join(engines)}")
+        print(f"Available scales: {', '.join(scales)}")
+        print("Examples:")
+        print("  python run_all_benchmarks.py small duckdb polars")
+        print("  python run_all_benchmarks.py medium")
+        print("  python run_all_benchmarks.py large datafusion")
+        print("  python run_all_benchmarks.py xlarge duckdb")
+        print("  python run_all_benchmarks.py --all-scales duckdb")
+        return
+    
+    print(f"Running benchmarks for scales: {selected_scales}")
+    print(f"Running engines: {selected_engines}")
     
     all_results = []
     
-    for engine in engines:
-        results = run_single_engine(engine)
-        all_results.extend(results)
+    for scale in selected_scales:
+        print(f"\n{'='*80}")
+        print(f"RUNNING BENCHMARKS FOR SCALE: {scale.upper()}")
+        print(f"{'='*80}")
+        
+        for engine in selected_engines:
+            results = run_single_engine(engine, scale)
+            all_results.extend(results)
     
     # Create comprehensive comparison
     if all_results:
@@ -79,25 +108,37 @@ def main():
         ])
         
         if not df.empty:
-            # Summary by engine
-            print("\nAVERAGE PERFORMANCE BY ENGINE:")
-            print("-" * 50)
-            engine_summary = df.groupby('engine').agg({
-                'execution_time': 'mean',
-                'memory_usage_mb': 'mean',
-                'cpu_percent': 'mean'
-            }).round(3)
+            # Extract scale from engine name (e.g., "duckdb_large" -> "large")
+            df['scale'] = df['engine'].str.split('_').str[-1]
+            df['engine_name'] = df['engine'].str.rsplit('_', n=1).str[0]
             
-            print(engine_summary.to_string())
-            
-            # Best performer by task
-            print("\nBEST PERFORMER BY TASK:")
-            print("-" * 40)
-            for task in df['task'].unique():
-                task_data = df[df['task'] == task]
-                if not task_data.empty:
-                    fastest = task_data.loc[task_data['execution_time'].idxmin()]
-                    print(f"{task:<20} {fastest['engine']:<12} ({fastest['execution_time']:.3f}s)")
+            # Group results by scale
+            for scale in df['scale'].unique():
+                scale_df = df[df['scale'] == scale]
+                
+                print(f"\n{'='*60}")
+                print(f"PERFORMANCE RESULTS FOR {scale.upper()} SCALE")
+                print(f"{'='*60}")
+                
+                # Summary by engine for this scale
+                print(f"\nAVERAGE PERFORMANCE BY ENGINE ({scale.upper()}):")
+                print("-" * 50)
+                engine_summary = scale_df.groupby('engine_name').agg({
+                    'execution_time': 'mean',
+                    'memory_usage_mb': 'mean',
+                    'cpu_percent': 'mean'
+                }).round(3).sort_values('execution_time')
+                
+                print(engine_summary.to_string())
+                
+                # Best performer by task for this scale
+                print(f"\nBEST PERFORMER BY TASK ({scale.upper()}):")
+                print("-" * 40)
+                for task in scale_df['task'].unique():
+                    task_data = scale_df[scale_df['task'] == task]
+                    if not task_data.empty:
+                        fastest = task_data.loc[task_data['execution_time'].idxmin()]
+                        print(f"{task:<20} {fastest['engine_name']:<12} ({fastest['execution_time']:.3f}s)")
             
             # Save detailed results
             output_file = Path(__file__).parent / 'benchmark_results.csv'
