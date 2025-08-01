@@ -3,6 +3,6 @@ benchmark_dbt:
   outputs:
     dev:
       type: duckdb
-      path: ':memory:'
+      path: 'target/benchmark.duckdb'
       extensions:
         - parquet

@@ -66,7 +66,7 @@ def validate_engine_results(engine_name, scale='small'):
 
 def main():
     """Validate all engines"""
-    engines = ['raw_python', 'duckdb', 'polars', 'datafusion']  # All standardized engines
+    engines = ['raw_python', 'duckdb', 'polars', 'datafusion', 'daft', 'pyspark']  # Test all engines
     scale = 'small'
     
     if len(sys.argv) > 1:

@@ -2,9 +2,13 @@ gateways:
   local:
     connection:
       type: duckdb
-      database: ':memory:'
+      database: '.sqlmesh/benchmark.duckdb'
 
 default_gateway: local
 
 model_defaults:
   dialect: duckdb
+
+variables:
+  profiles_path: ""
+  events_path: ""

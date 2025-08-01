@@ -4,7 +4,7 @@ A comprehensive comparison of modern data processing engines, showcasing both pe
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Benchmarks](https://img.shields.io/badge/Engines-8-orange.svg)](#engines-tested)
+[![Benchmarks](https://img.shields.io/badge/Engines-6_Validated-green.svg)](#engines-tested)
 
 ## 🎯 Overview
 
@@ -101,7 +101,11 @@ python validate_results.py small
 | 🥇 | **DataFusion** | 0.009s | 14.5MB | Load Data, Complex Analytics |
 | 🥈 | **Polars** | 0.014s | 23.9MB | Filter & Aggregate, Write Results |
 | 🥉 | **DuckDB** | 0.031s | 8.0MB | Join Datasets |
-| 4th | **Raw Python** | 0.060s | 39.6MB | Baseline Reference |
+| 4th | **Daft** | TBD | TBD | Distributed Processing |
+| 5th | **PySpark** | TBD | TBD | Large Scale Processing |
+| 6th | **Raw Python** | 0.060s | 39.6MB | Baseline Reference |
+
+*Note: Performance benchmarks for Daft and PySpark are pending - engines are validated for correctness*
 
 ### Scaling Performance
 
@@ -110,9 +114,11 @@ python validate_results.py small
 | **DataFusion** | 0.009s | 0.086s | 0.385s |
 | **Polars** | 0.014s | 0.126s | 1.332s |
 | **DuckDB** | 0.031s | 0.226s | 0.694s |
+| **Daft** | TBD | TBD | TBD |
+| **PySpark** | TBD | TBD | TBD |
 | **Raw Python** | 0.060s | 0.435s | ~2.1s* |
 
-*Estimated based on scaling patterns
+*Performance benchmarks pending for newly standardized engines
 
 ### Key Insights
 
@@ -120,14 +126,17 @@ python validate_results.py small
 - **DataFusion** dominates across all scales with exceptional Arrow-based performance
 - **DuckDB** excels at SQL operations and maintains good scaling characteristics  
 - **Polars** shows excellent small-to-medium scale performance but faces memory pressure at large scale
+- **Daft** and **PySpark** are now validated for correctness - performance benchmarks pending
 - **Raw Python** provides a solid baseline but doesn't scale as efficiently
 
 **Code Style & Usability:**
 - **SQL-based engines** (DuckDB, DataFusion) offer familiar syntax for SQL developers
-- **DataFrame engines** (Polars, Pandas) provide intuitive method chaining for Python developers
+- **DataFrame engines** (Polars, Daft, Raw Python) provide intuitive method chaining for Python developers
+- **Distributed engines** (PySpark, Daft) excel at large-scale processing with cluster capabilities
 - **Polars** offers the most concise and readable functional-style code
 - **DuckDB** provides the most powerful SQL features with CTEs and window functions
 - **DataFusion** combines SQL familiarity with Arrow performance benefits
+- **PySpark** provides mature distributed processing with extensive ecosystem support
 
 ## �  Code Style & Paradigm Comparison
 
@@ -191,6 +200,30 @@ result = ctx.sql("""
 """).collect()
 ```
 
+**Daft**:
+```python
+# Uses pandas fallback for complex timestamp operations
+events_pd = events_df.to_pandas()
+events_pd['event_timestamp_dt'] = pd.to_datetime(events_pd['event_timestamp'])
+recent_events_pd = events_pd[events_pd['event_timestamp_dt'] >= seven_days_ago]
+result_pd = recent_events_pd.groupby(['customer_id', 'event_type']).agg({
+    'event_id': 'count'
+}).reset_index()
+```
+
+**PySpark**:
+```python
+events_with_ts = events_df.withColumn(
+    "event_timestamp_dt", 
+    coalesce(
+        try_to_timestamp(col("event_timestamp"), lit("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")),
+        try_to_timestamp(col("event_timestamp"), lit("yyyy-MM-dd'T'HH:mm:ss"))
+    )
+)
+result = events_with_ts.filter(col("event_timestamp_dt") >= lit(seven_days_ago)) \
+    .groupBy("customer_id", "event_type").agg(count("event_id"))
+```
+
 This allows developers to:
 - **Compare syntax preferences** (SQL vs DataFrame operations)
 - **Evaluate code readability** and maintainability
@@ -207,13 +240,13 @@ This allows developers to:
 | **Polars** | DataFrame | Rust-based high-performance DataFrames | ✅ Validated |
 | **DuckDB** | SQL Database | In-process analytical database | ✅ Validated |
 | **DataFusion** | Query Engine | Apache Arrow's Rust query engine | ✅ Validated |
+| **Daft** | DataFrame | Distributed multimodal DataFrames | ✅ Validated |
+| **PySpark** | Distributed | Apache Spark for Python | ✅ Validated |
 
 ### 🔄 Being Standardized
 
 | Engine | Type | Description | Status |
 |--------|------|-------------|--------|
-| **Daft** | DataFrame | Distributed multimodal DataFrames | 🔄 In Progress |
-| **PySpark** | Distributed | Apache Spark for Python | 🔄 In Progress |
 | **dbt** | Transformation | SQL-based data transformation | 🔄 In Progress |
 | **SQLMesh** | Framework | Data transformation framework | 🔄 In Progress |
 
@@ -282,9 +315,14 @@ load_time = runner.run_benchmark("polars", "load_data", benchmark.load_data)
 
 ### Validation System
 
+All engines are validated to produce identical results, ensuring fair performance comparisons:
+
 ```bash
+# Validate all engines
+python validate_results.py small
+
 # Validate specific engines
-python validate_results.py small raw_python polars
+python validate_results.py small raw_python polars daft pyspark
 
 # Expected output for valid engines:
 # ✅ load_data: 110000 (matches expected)
@@ -292,7 +330,13 @@ python validate_results.py small raw_python polars
 # ✅ join_datasets: 100000 (matches expected)
 # ✅ complex_analytics: 10000 (matches expected)
 # ✅ write_results: 4 (matches expected)
+# 🎉 All engines validation PASSED!
 ```
+
+**Recent Standardization Work:**
+- **Daft**: Implemented pandas fallback for complex timestamp operations due to API limitations
+- **PySpark**: Fixed timestamp parsing with `try_to_timestamp` and proper string literal handling
+- **All Engines**: Standardized 7-day filtering, join operations, and analytics calculations
 
 ## 🤝 Contributing
 
