@@ -30,3 +30,11 @@ these companies.
 * [Material for the Data platform - Metadata](https://github.com/data-engineering-helpers/metadata)
 * [Material for the Data platform - Data quality](https://github.com/data-engineering-helpers/data-quality)
 
+# Articles
+
+## Polars vs DuckDB
+* Title: CSV, GZip, S3, Python (Polars vs DuckDB)
+* Author: by Daniel Beach
+* Date: Nov.2025
+* Link to the article on Substack:
+  https://dataengineeringcentral.substack.com/p/gzip-csv-python-s3-polars-vs-duckdb
