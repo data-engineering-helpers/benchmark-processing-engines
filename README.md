@@ -32,9 +32,37 @@ these companies.
 
 # Articles
 
+## Accelerating Apache Spark's Execution Engine
+* Title: Accelerating Apache Spark's Execution Engine
+* Author: [Dipankar Mazumdar](https://www.linkedin.com/in/dipankar-mazumdar/)
+* Date: Dec. 2025
+* Post on LinkedIn:
+  https://www.linkedin.com/posts/dipankar-mazumdar_dataengineering-softwareengineering-activity-7401428947315458048-d7wf/
+
+## Accelerating Apache Spark with Gluten and Velox
+* Title: Accelerating Apache Spark with Gluten & Velox
+* Author: Angel Conde
+  ([Angel Conde on ](https://www.linkedin.com/in/acmanjon/),
+  [Angel Conde on Medium](https://medium.com/@neuw84))
+* Date: Sep. 2025
+* Link to the article on Medium:
+  https://medium.com/@neuw84/accelerating-apache-spark-with-gluten-velox-3529c4235632
+* Companion Git repository: https://github.com/Neuw84/spark-gluten-velox . It features a benchmark with:
+  * Public, generated, datasets containing a fact table and dimension tables
+  * Several queries representing typical analytics workload:
+    * Query A — Heavy multi‑aggregation: Groups the fact table by `country_id` and `channel_id` and computes
+      counts, sums, averages, standard deviation and approximate percentiles. This pattern stresses
+      hash aggregation, projection and filter operators.
+    * Query B — Rollup (cube) aggregation: Joins the fact table with a date dimension and uses
+      `rollup(date_key, country_id, product_id)` to compute revenue, quantity and average discount across multiple
+      grouping levels.
+    * Query C — Star schema join and top‑K sort: Joins the fact table with broadcast dimensions (countries and channels)
+      and the date dimension, computes gross and net revenue, and orders by gross descending, taking the top 5,000 rows.
+      Broadcast joins and top‑K sorts test Velox’s vectorized join and sort operators.
+
 ## Polars vs DuckDB
 * Title: CSV, GZip, S3, Python (Polars vs DuckDB)
-* Author: by Daniel Beach
-* Date: Nov.2025
+* Author: Daniel Beach
+* Date: Nov. 2025
 * Link to the article on Substack:
   https://dataengineeringcentral.substack.com/p/gzip-csv-python-s3-polars-vs-duckdb
