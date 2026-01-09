@@ -32,6 +32,16 @@ these companies.
 
 # Articles
 
+## Light ETL Python engines
+* Author: Mimoune Djouallah
+  ([Mimoune Djouallah on LinkedIn](https://www.linkedin.com/in/mimounedjouallah),
+  [Mimoune Djouallah on GitHub](https://github.com/djouallah))
+* Date: Jan. 2026
+* Git repository with a Jupyter notebook and fully reproducible scripts:
+  https://github.com/djouallah/Fabric_Notebooks_Demo/blob/main/ETL/Light_ETL_Python_Notebook.ipynb
+* Post on LinkedIn:
+  https://www.linkedin.com/posts/mimounedjouallah_python-daft-chdb-activity-7415374580753571840--2-5/
+
 ## Accelerating Apache Spark's Execution Engine
 * Title: Accelerating Apache Spark's Execution Engine
 * Author: [Dipankar Mazumdar](https://www.linkedin.com/in/dipankar-mazumdar/)
