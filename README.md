@@ -39,6 +39,8 @@ these companies.
 * Date: Jan. 2026
 * Git repository with a Jupyter notebook and fully reproducible scripts:
   https://github.com/djouallah/Fabric_Notebooks_Demo/blob/main/ETL/Light_ETL_Python_Notebook.ipynb
+  * Git repository with the data sets:
+  https://github.com/djouallah/fabric_demo/tree/main/data/archive
 * Post on LinkedIn:
   https://www.linkedin.com/posts/mimounedjouallah_python-daft-chdb-activity-7415374580753571840--2-5/
 
