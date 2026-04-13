@@ -7,6 +7,8 @@
   * [Overview](#overview)
   * [References](#references)
   * [Articles](#articles)
+    * [Spark ecosystem architectural shift towards native engines](#spark-ecosystem-architectural-shift-towards-native-engines)
+    * [ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark](#clickHouse-vs-starrocks-vs-presto-vs-trino-vs-apache-spark)
     * [Light ETL Python engines](#light-etl-python-engines)
     * [Accelerating Apache Spark's Execution Engine](#accelerating-apache-sparks-execution-engine)
     * [Accelerating Apache Spark with Gluten and Velox](#accelerating-apache-spark-with-gluten-and-velox)
@@ -44,6 +46,40 @@ these companies.
 * [Material for the Data platform - Data quality](https://github.com/data-engineering-helpers/data-quality)
 
 ## Articles
+
+### Spark ecosystem architectural shift towards native engines
+
+* [LinkedIn post - Spark ecosystem architectural shift](https://www.linkedin.com/posts/lakehouse_the-spark-ecosystem-is-quietly-undergoing-activity-7444376892960399360-_IEn/)
+  * Date: Apr. 2026
+  * Author: [Kyle Weller](https://www.linkedin.com/in/lakehouse/)
+
+> The Spark ecosystem is quietly undergoing a deep architectural shift from
+> JVM-bound execution toward heterogeneous, vectorized, native backends.
+> What used to be a monolithic execution engine is now a pluggable compute
+> substrate.
+>
+> At a high level, Spark is evolving into a query planner plus orchestration
+> layer, delegating execution to specialized engines:
+>
+> * Photon (Databricks) → tightly integrated C++ vectorized engine optimized for
+>   whole-stage codegen replacement
+> * Quanton (Onehouse) → native execution layer pushing Hudi and Iceberg native
+>   and lakehouse optimizations closer to storage
+> * RAPIDS (NVIDIA) → GPU-accelerated columnar execution via cuDF, translating
+>   Spark plans into GPU kernels
+> * Gluten (Intel + ecosystem) → Velox backend bridge, decoupling Spark from
+>   JVM execution
+> * Velox (Meta) → reusable vectorized execution engine underpinning multiple
+>   systems (Presto, Spark via Gluten)
+> * DataFusion Comet (InfluxData) → Rust-native execution aligned with Arrow
+>   memory model
+> * Plus many more
+
+### ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark
+
+* Title: ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark — Comparing Analytics Engines
+* Date: Apr. 2025
+* [OneHouse blog - ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark](https://www.onehouse.ai/blog/apache-spark-vs-clickhouse-vs-presto-vs-starrocks-vs-trino-comparing-analytics-engines)
 
 ### Light ETL Python engines
 
