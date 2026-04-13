@@ -8,7 +8,7 @@
   * [References](#references)
   * [Articles](#articles)
     * [Spark ecosystem architectural shift towards native engines](#spark-ecosystem-architectural-shift-towards-native-engines)
-    * [ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark](#clickHouse-vs-starrocks-vs-presto-vs-trino-vs-apache-spark)
+    * [ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark](#clickhouse-vs-starrocks-vs-presto-vs-trino-vs-apache-spark)
     * [Light ETL Python engines](#light-etl-python-engines)
     * [Accelerating Apache Spark's Execution Engine](#accelerating-apache-sparks-execution-engine)
     * [Accelerating Apache Spark with Gluten and Velox](#accelerating-apache-spark-with-gluten-and-velox)
@@ -77,7 +77,8 @@ these companies.
 
 ### ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark
 
-* Title: ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark — Comparing Analytics Engines
+* Title: ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark —
+  Comparing Analytics Engines
 * Date: Apr. 2025
 * [OneHouse blog - ClickHouse vs StarRocks vs Presto vs Trino vs Apache Spark](https://www.onehouse.ai/blog/apache-spark-vs-clickhouse-vs-presto-vs-starrocks-vs-trino-comparing-analytics-engines)
 
